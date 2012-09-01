@@ -8,7 +8,7 @@
                             xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
                             xmlns:toolkit="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone.Controls.Toolkit"
                             xmlns:viewmodels="clr-namespace:WindowsPhoneFanDkApp.ViewModels"
-                            d:DesignHeight="768"
+                            xmlns:Converts="clr-namespace:WindowsPhoneFanDkApp.Converts" d:DesignHeight="768"
                             d:DesignWidth="480"
                             FontFamily="{StaticResource PhoneFontFamilyNormal}"
                             FontSize="{StaticResource PhoneFontSizeNormal}"
@@ -16,11 +16,16 @@
                             Orientation="Portrait"
                             shell:SystemTray.IsVisible="True"
                             SupportedOrientations="Portrait"
-                            mc:Ignorable="d">
+                            mc:Ignorable="d"
+                            toolkit:TiltEffect.IsTiltEnabled="True">
 
     <phone:PhoneApplicationPage.DataContext>
         <viewmodels:MainPageViewModel />
     </phone:PhoneApplicationPage.DataContext>
+    
+    <phone:PhoneApplicationPage.Resources>
+        <Converts:PostInfoConverter x:Name="authorConverter" />
+    </phone:PhoneApplicationPage.Resources>
 
     <toolkit:TransitionService.NavigationInTransition>
         <toolkit:NavigationInTransition>
@@ -52,22 +57,24 @@
         <!--  ContentPanel - place additional content here  -->
         <Grid x:Name="ContentPanel"
               Grid.Row="0"
-              Margin="12,0,12,0">
+              Margin="0,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-
-            <TextBlock Grid.Row="0" Text="{Binding Status, StringFormat='Status: \{0\}'}" />
-            <ListBox Grid.Row="1"
+            
+            <ListBox Name="listPosts" Grid.Row="1"
                      ItemsSource="{Binding Posts}"
                      HorizontalAlignment="Stretch" 
-    				 VerticalAlignment="Stretch" >
+    				 VerticalAlignment="Stretch" SelectionChanged="ListBox_SelectionChanged" >
                 <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <controls:HtmlTextBlock Html="{Binding Title}" />
-                            <controls:HtmlTextBlock Html="{Binding Content}" />
+                    <DataTemplate>                       
+                        <StackPanel Orientation="Horizontal" Margin="20">
+                            <Image Source="{Binding Thumbnail, Converter={StaticResource ImageCacheConverter}}"  MaxWidth="150"/>
+                            <StackPanel Orientation="Vertical" VerticalAlignment="Stretch">
+                                <controls:HtmlTextBlock Html="{Binding Title}" Width="300"/>
+                                <TextBlock Text="{Binding Path=PostSignature, Converter={StaticResource authorConverter}}" FontSize="8" FontWeight="ExtraLight" FontStyle="Italic" Foreground="Gray" Margin="10,0,0,0" VerticalAlignment="Bottom"/>                                
+                            </StackPanel>
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
